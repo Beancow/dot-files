@@ -1,0 +1,51 @@
+# Enable command substitution in prompt
+setopt PROMPT_SUBST
+
+# Color definitions
+PRINCESS_WHITE='#FFFFFF'
+PRINCESS_TAN='#CC3802'
+PRINCESS_TEAL='#047E84'
+PRINCESS_PLUM='#9A348E'
+PRINCESS_BLUSH='#DA627D'
+PRINCESS_SALMON='#FCA17D'
+PRINCESS_SKY='#86BBD8'
+PRINCESS_TEAL_BLUE='#33658A'
+
+# Define special characters with proper escaping
+POWERLINE_SYMBOL=$'\ue0b0'
+HEART_SYMBOL=$'\u2665'
+ARROW_SYMBOL=$'\u279c'
+STASH_SYMBOL=$'\ueb4b'
+NODE_SYMBOL=$'\ue718'
+LEADING_DIAMOND=$'\ue0b6'
+
+# Git segment function
+princess_git_info() {
+    local ref
+    ref=$(command git symbolic-ref HEAD 2> /dev/null) || \
+    ref=$(command git rev-parse --short HEAD 2> /dev/null) || return 0
+    echo " ${ARROW_SYMBOL} (${ref#refs/heads/}$(git_stash_count))"
+}
+
+git_stash_count() {
+    local stash_count
+    stash_count=$(git stash list 2>/dev/null | wc -l | tr -d ' ')
+    [[ "$stash_count" -gt 0 ]] && echo " ${STASH_SYMBOL} ${stash_count}"
+}
+
+# Node segment function
+princess_node_info() {
+    which node &> /dev/null && echo "${NODE_SYMBOL} $(node -v)"
+}
+
+# Time segment function
+princess_time_info() {
+    echo " ${HEART_SYMBOL}  $(date '+%H:%M') "
+}
+
+# Update prompt definition
+PROMPT='%{%k%F{${PRINCESS_PLUM}}%}${LEADING_DIAMOND}%{%K{${PRINCESS_PLUM}}%F{${PRINCESS_WHITE}}%}%n %{%K{${PRINCESS_BLUSH}}%F{${PRINCESS_PLUM}}%}${POWERLINE_SYMBOL}'
+PROMPT+='%{%K{${PRINCESS_BLUSH}}%F{${PRINCESS_WHITE}}%} ${FOLDER_SYMBOL} %~ %{%K{${PRINCESS_SKY}}%F{${PRINCESS_BLUSH}}%}${POWERLINE_SYMBOL}'
+PROMPT+='%{%K{${PRINCESS_SKY}}%F{${PRINCESS_WHITE}}%}$(princess_git_info) %{%K{${PRINCESS_SKY}}%F{${PRINCESS_SKY}}%}${POWERLINE_SYMBOL}'
+PROMPT+='%{%K{${PRINCESS_SKY}}%F{${PRINCESS_WHITE}}%}$(princess_node_info) %{%K{${PRINCESS_TEAL_BLUE}}%F{${PRINCESS_SKY}}%}${POWERLINE_SYMBOL}'
+PROMPT+='%{%K{${PRINCESS_TEAL_BLUE}}%F{${PRINCESS_WHITE}}%}$(princess_time_info)%{%k%F{${PRINCESS_TEAL_BLUE}}%}${POWERLINE_SYMBOL}%{%f%} '
