@@ -18,6 +18,8 @@ ARROW_SYMBOL=$'\u279c'
 STASH_SYMBOL=$'\ueb4b'
 NODE_SYMBOL=$'\ue718'
 LEADING_DIAMOND=$'\ue0b6'
+FOLDER_SYMBOL=$'\ue5fe'
+GIT_SYMBOL=$'\ue725'
 
 # Git segment function
 princess_git_info() {
@@ -35,17 +37,31 @@ git_stash_count() {
 
 # Node segment function
 princess_node_info() {
-    which node &> /dev/null && echo "${NODE_SYMBOL} $(node -v)"
+    # First check if node exists
+    if ! command -v node &> /dev/null; then
+        echo "node not available"
+    fi
+    
+    # Then check for git repo or package.json
+    if git rev-parse --is-inside-work-tree &> /dev/null || [ -f "package.json" ]; then
+        echo "${NODE_SYMBOL} $(node -v)"
+    else
+        echo "local ${FOLDER_SYMBOL}"
+    fi
 }
 
 # Time segment function
 princess_time_info() {
-    echo " ${HEART_SYMBOL}  $(date '+%H:%M') "
+    echo " ${HEART_SYMBOL} $(date '+%H:%M') "
+}
+
+princess_path_info() {
+    echo " ${FOLDER_SYMBOL} %~ "
 }
 
 # Update prompt definition
 PROMPT='%{%k%F{${PRINCESS_PLUM}}%}${LEADING_DIAMOND}%{%K{${PRINCESS_PLUM}}%F{${PRINCESS_WHITE}}%}%n %{%K{${PRINCESS_BLUSH}}%F{${PRINCESS_PLUM}}%}${POWERLINE_SYMBOL}'
-PROMPT+='%{%K{${PRINCESS_BLUSH}}%F{${PRINCESS_WHITE}}%} ${FOLDER_SYMBOL} %~ %{%K{${PRINCESS_SKY}}%F{${PRINCESS_BLUSH}}%}${POWERLINE_SYMBOL}'
-PROMPT+='%{%K{${PRINCESS_SKY}}%F{${PRINCESS_WHITE}}%}$(princess_git_info) %{%K{${PRINCESS_SKY}}%F{${PRINCESS_SKY}}%}${POWERLINE_SYMBOL}'
+PROMPT+='%{%K{${PRINCESS_BLUSH}}%F{${PRINCESS_WHITE}}%} %~ %{%K{${PRINCESS_SKY}}%F{${PRINCESS_BLUSH}}%}${POWERLINE_SYMBOL}'
+PROMPT+='%{%K{${PRINCESS_SKY}}%F{${PRINCESS_WHITE}}%}$(princess_git_info)%{%K{${PRINCESS_SKY}}%F{${PRINCESS_SKY}}%}${POWERLINE_SYMBOL}'
 PROMPT+='%{%K{${PRINCESS_SKY}}%F{${PRINCESS_WHITE}}%}$(princess_node_info) %{%K{${PRINCESS_TEAL_BLUE}}%F{${PRINCESS_SKY}}%}${POWERLINE_SYMBOL}'
 PROMPT+='%{%K{${PRINCESS_TEAL_BLUE}}%F{${PRINCESS_WHITE}}%}$(princess_time_info)%{%k%F{${PRINCESS_TEAL_BLUE}}%}${POWERLINE_SYMBOL}%{%f%} '
