@@ -64,7 +64,7 @@ is_git_repo() {
     git rev-parse --is-inside-work-tree &> /dev/null
 }
 
-# Modify git segment function to include conditional
+# Conditional git segment
 princess_git_segment() {
     if is_git_repo; then
         echo "%{%K{${PRINCESS_SALMON}}%F{${PRINCESS_BLUSH}}%}${POWERLINE_SYMBOL}%{%F{${PRINCESS_WHITE}}%}$(princess_git_info) %{%K{${PRINCESS_SKY}}%F{${PRINCESS_SALMON}}%}"
@@ -73,7 +73,7 @@ princess_git_segment() {
     fi
 }
 
-# Update prompt definition
+# Update prompt definitions
 PROMPT='%{%k%F{${PRINCESS_PLUM}}%}${LEADING_DIAMOND}%{%K{${PRINCESS_PLUM}}%F{${PRINCESS_WHITE}}%}%n %{%K{${PRINCESS_BLUSH}}%F{${PRINCESS_PLUM}}%}${POWERLINE_SYMBOL}'
 PROMPT+='%{%K{${PRINCESS_BLUSH}}%F{${PRINCESS_WHITE}}%} %~ '
 PROMPT+='$(princess_git_segment)${POWERLINE_SYMBOL}'
