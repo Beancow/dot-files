@@ -2,24 +2,38 @@
 setopt PROMPT_SUBST
 
 # Color definitions
-PRINCESS_WHITE='#FFFFFF'
-PRINCESS_TAN='#CC3802'
-PRINCESS_TEAL='#047E84'
-PRINCESS_PLUM='#9A348E'
-PRINCESS_BLUSH='#DA627D'
-PRINCESS_SALMON='#FCA17D'
-PRINCESS_SKY='#86BBD8'
-PRINCESS_TEAL_BLUE='#33658A'
+# Check terminal color support
+if [[ "$COLORTERM" == "truecolor" ]] || [[ "$TERM" == *"24bit"* ]]; then
+    # True color (24-bit) support
+    PRINCESS_WHITE='#FFFFFF'
+    PRINCESS_TAN='#CC3802'
+    PRINCESS_TEAL='#047E84'
+    PRINCESS_PLUM='#9A348E'
+    PRINCESS_BLUSH='#DA627D'
+    PRINCESS_SALMON='#FCA17D'
+    PRINCESS_SKY='#86BBD8'
+    PRINCESS_TEAL_BLUE='#33658A'
+else
+    # Fallback to 256 colors
+    PRINCESS_WHITE='255'    # Pure white
+    PRINCESS_TAN='166'     # Dark orange
+    PRINCESS_TEAL='30'     # Deep teal
+    PRINCESS_PLUM='161'    # Medium purple
+    PRINCESS_BLUSH='161'   # Pink
+    PRINCESS_SALMON='216'  # Light salmon
+    PRINCESS_SKY='110'     # Light blue
+    PRINCESS_TEAL_BLUE='25' # Deep blue
+fi
 
 # Define special characters with proper escaping
 POWERLINE_SYMBOL=$'\ue0b0'
-HEART_SYMBOL=$'\u2665'
+HEART_SYMBOL=$'\u2764'
 ARROW_SYMBOL=$'\u279c'
 STASH_SYMBOL=$'\ueb4b'
 NODE_SYMBOL=$'\ue718'
 LEADING_ROUNDED=$'\ue0b6'
 ENDING_ROUNDED=$'\ue0b4'
-FOLDER_SYMBOL=$'\ue5fe'
+FOLDER_SYMBOL=$'\uF115'
 GIT_SYMBOL=$'\ue725'
 
 # Git segment function
