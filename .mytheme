@@ -15,13 +15,13 @@ if [[ "$COLORTERM" == "truecolor" ]] || [[ "$TERM" == *"24bit"* ]]; then
     COLOR_SIX="#A30262"
 else
     # Fallback to 256 colors
-    COLOR_WHITE='255'      # #FFFFFF
-    COLOR_ONE='160' # #D52D00 -> Red
-    COLOR_TWO='208'  # #EF7627 -> Dark Orange
-    COLOR_THREE='215'  # #FF9A56 -> Light Orange
-    COLOR_FOUR='169'   # #D162A4 -> Medium Pink
-    COLOR_FIVE='132' # #B55690 -> Medium Purple
-    COLOR_SIX='125' # #A30262 -> Deep Pink
+    COLOR_WHITE='255' # #FFFFFF
+    COLOR_ONE='160'   # #D52D00 -> Red
+    COLOR_TWO='208'   # #EF7627 -> Dark Orange
+    COLOR_THREE='215' # #FF9A56 -> Light Orange
+    COLOR_FOUR='169'  # #D162A4 -> Medium Pink
+    COLOR_FIVE='132'  # #B55690 -> Medium Purple
+    COLOR_SIX='125'   # #A30262 -> Deep Pink
 fi
 
 # Define special characters with proper escaping
