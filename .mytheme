@@ -6,7 +6,7 @@ setopt PROMPT_SUBST
 # Check terminal color support
 if [[ "$COLORTERM" == "truecolor" ]] || [[ "$TERM" == *"24bit"* ]]; then
     # True color (24-bit) support
-    COLOUR_WHITE='#FFFFFF'
+    COLOR_WHITE='#FFFFFF'
     COLOR_ONE='#D52D00'
     COLOR_TWO='#EF7627'
     COLOR_THREE='#FF9A56'
@@ -15,7 +15,7 @@ if [[ "$COLORTERM" == "truecolor" ]] || [[ "$TERM" == *"24bit"* ]]; then
     COLOR_SIX="#A30262"
 else
     # Fallback to 256 colors
-    COLOUR_WHITE='255'      # #FFFFFF
+    COLOR_WHITE='255'      # #FFFFFF
     COLOR_ONE='160' # #D52D00 -> Red
     COLOR_TWO='208'  # #EF7627 -> Dark Orange
     COLOR_THREE='215'  # #FF9A56 -> Light Orange
@@ -81,16 +81,16 @@ is_git_repo() {
 # Conditional git segment
 git_segment() {
     if is_git_repo; then
-        echo "%{%K{${COLOR_THREE}}%F{${COLOR_TWO}}%}${POWERLINE_SYMBOL}%{%F{${COLOUR_WHITE}}%}$(git_info) %{%K{${COLOR_FOUR}}%F{${COLOR_THREE}}%}"
+        echo "%{%K{${COLOR_THREE}}%F{${COLOR_TWO}}%}${POWERLINE_SYMBOL}%{%F{${COLOR_WHITE}}%}$(git_info) %{%K{${COLOR_FOUR}}%F{${COLOR_THREE}}%}"
     else
         echo "%{%K{${COLOR_FOUR}}%F{${COLOR_TWO}}%}"
     fi
 }
 
 # Update prompt definitions
-PROMPT='%{%k%F{${COLOR_ONE}}%}${LEADING_ROUNDED}%{%K{${COLOR_ONE}}%F{${COLOUR_WHITE}}%}%n %{%K{${COLOR_TWO}}%F{${COLOR_ONE}}%}${POWERLINE_SYMBOL}'
-PROMPT+='%{%K{${COLOR_TWO}}%F{${COLOUR_WHITE}}%} %~ '
+PROMPT='%{%k%F{${COLOR_ONE}}%}${LEADING_ROUNDED}%{%K{${COLOR_ONE}}%F{${COLOR_WHITE}}%}%n %{%K{${COLOR_TWO}}%F{${COLOR_ONE}}%}${POWERLINE_SYMBOL}'
+PROMPT+='%{%K{${COLOR_TWO}}%F{${COLOR_WHITE}}%} %~ '
 PROMPT+='$(git_segment)${POWERLINE_SYMBOL}'
-PROMPT+='%{%K{${COLOR_FOUR}}%F{${COLOUR_WHITE}}%} $(node_info) %{%K{${COLOR_FIVE}}%F{${COLOR_FOUR}}%}${POWERLINE_SYMBOL}'
-PROMPT+='%{%K{${COLOR_FIVE}}%F{${COLOUR_WHITE}}%}$(time_info)%{%k%F{${COLOR_FIVE}}%}${ENDING_ROUNDED}% '
+PROMPT+='%{%K{${COLOR_FOUR}}%F{${COLOR_WHITE}}%} $(node_info) %{%K{${COLOR_FIVE}}%F{${COLOR_FOUR}}%}${POWERLINE_SYMBOL}'
+PROMPT+='%{%K{${COLOR_FIVE}}%F{${COLOR_WHITE}}%}$(time_info)%{%k%F{${COLOR_FIVE}}%}${ENDING_ROUNDED}% '
 PROMPT+=$'\n %{%{%k%F{${COLOR_ONE}}%}└➤ %{%f%}'
