@@ -1,3 +1,4 @@
+# Inspired by the M365 Princess theme usually available on Oh-My-ZSH
 # Enable command substitution in prompt
 setopt PROMPT_SUBST
 
@@ -5,22 +6,22 @@ setopt PROMPT_SUBST
 # Check terminal color support
 if [[ "$COLORTERM" == "truecolor" ]] || [[ "$TERM" == *"24bit"* ]]; then
     # True color (24-bit) support
-    PRINCESS_WHITE='#FFFFFF'
-    PRINCESS_COLOR_ONE='#D52D00'
-    PRINCESS_COLOR_TWO='#EF7627'
-    PRINCESS_COLOR_THREE='#FF9A56'
-    PRINCESS_COLOR_FOUR='#D162A4'
-    PRINCESS_COLOR_FIVE='#B55690'
-    PRINCESS_COLOR_SIX="#A30262"
+    COLOUR_WHITE='#FFFFFF'
+    COLOR_ONE='#D52D00'
+    COLOR_TWO='#EF7627'
+    COLOR_THREE='#FF9A56'
+    COLOR_FOUR='#D162A4'
+    COLOR_FIVE='#B55690'
+    COLOR_SIX="#A30262"
 else
     # Fallback to 256 colors
-    PRINCESS_WHITE='255'      # #FFFFFF
-    PRINCESS_COLOR_ONE='160' # #D52D00 -> Red
-    PRINCESS_COLOR_TWO='208'  # #EF7627 -> Dark Orange
-    PRINCESS_COLOR_THREE='215'  # #FF9A56 -> Light Orange
-    PRINCESS_COLOR_FOUR='169'   # #D162A4 -> Medium Pink
-    PRINCESS_COLOR_FIVE='132' # #B55690 -> Medium Purple
-    PRINCESS_COLOR_SIX='125' # #A30262 -> Deep Pink
+    COLOUR_WHITE='255'      # #FFFFFF
+    COLOR_ONE='160' # #D52D00 -> Red
+    COLOR_TWO='208'  # #EF7627 -> Dark Orange
+    COLOR_THREE='215'  # #FF9A56 -> Light Orange
+    COLOR_FOUR='169'   # #D162A4 -> Medium Pink
+    COLOR_FIVE='132' # #B55690 -> Medium Purple
+    COLOR_SIX='125' # #A30262 -> Deep Pink
 fi
 
 # Define special characters with proper escaping
@@ -35,7 +36,7 @@ FOLDER_SYMBOL=$'\uF115'
 GIT_SYMBOL=$'\ue725'
 
 # Git segment function
-princess_git_info() {
+git_info() {
     local ref
     ref=$(command git symbolic-ref HEAD 2> /dev/null) || \
     ref=$(command git rev-parse --short HEAD 2> /dev/null) || return 0
@@ -49,7 +50,7 @@ git_stash_count() {
 }
 
 # Node segment function
-princess_node_info() {
+node_info() {
     # First check if node exists
     if ! command -v node &> /dev/null; then
         echo "node not available"
@@ -64,11 +65,11 @@ princess_node_info() {
 }
 
 # Time segment function
-princess_time_info() {
+time_info() {
     echo " ${HEART_SYMBOL} $(date '+%H:%M') "
 }
 
-princess_path_info() {
+path_info() {
     echo " ${FOLDER_SYMBOL} %~ "
 }
 
@@ -78,18 +79,18 @@ is_git_repo() {
 }
 
 # Conditional git segment
-princess_git_segment() {
+git_segment() {
     if is_git_repo; then
-        echo "%{%K{${PRINCESS_COLOR_THREE}}%F{${PRINCESS_COLOR_TWO}}%}${POWERLINE_SYMBOL}%{%F{${PRINCESS_WHITE}}%}$(princess_git_info) %{%K{${PRINCESS_COLOR_FOUR}}%F{${PRINCESS_COLOR_THREE}}%}"
+        echo "%{%K{${COLOR_THREE}}%F{${COLOR_TWO}}%}${POWERLINE_SYMBOL}%{%F{${COLOUR_WHITE}}%}$(git_info) %{%K{${COLOR_FOUR}}%F{${COLOR_THREE}}%}"
     else
-        echo "%{%K{${PRINCESS_COLOR_FOUR}}%F{${PRINCESS_COLOR_TWO}}%}"
+        echo "%{%K{${COLOR_FOUR}}%F{${COLOR_TWO}}%}"
     fi
 }
 
 # Update prompt definitions
-PROMPT='%{%k%F{${PRINCESS_COLOR_ONE}}%}${LEADING_ROUNDED}%{%K{${PRINCESS_COLOR_ONE}}%F{${PRINCESS_WHITE}}%}%n %{%K{${PRINCESS_COLOR_TWO}}%F{${PRINCESS_COLOR_ONE}}%}${POWERLINE_SYMBOL}'
-PROMPT+='%{%K{${PRINCESS_COLOR_TWO}}%F{${PRINCESS_WHITE}}%} %~ '
-PROMPT+='$(princess_git_segment)${POWERLINE_SYMBOL}'
-PROMPT+='%{%K{${PRINCESS_COLOR_FOUR}}%F{${PRINCESS_WHITE}}%} $(princess_node_info) %{%K{${PRINCESS_COLOR_FIVE}}%F{${PRINCESS_COLOR_FOUR}}%}${POWERLINE_SYMBOL}'
-PROMPT+='%{%K{${PRINCESS_COLOR_FIVE}}%F{${PRINCESS_WHITE}}%}$(princess_time_info)%{%k%F{${PRINCESS_COLOR_FIVE}}%}${ENDING_ROUNDED}% '
-PROMPT+=$'\n %{%{%k%F{${PRINCESS_COLOR_ONE}}%}└➤ %{%f%}'
+PROMPT='%{%k%F{${COLOR_ONE}}%}${LEADING_ROUNDED}%{%K{${COLOR_ONE}}%F{${COLOUR_WHITE}}%}%n %{%K{${COLOR_TWO}}%F{${COLOR_ONE}}%}${POWERLINE_SYMBOL}'
+PROMPT+='%{%K{${COLOR_TWO}}%F{${COLOUR_WHITE}}%} %~ '
+PROMPT+='$(git_segment)${POWERLINE_SYMBOL}'
+PROMPT+='%{%K{${COLOR_FOUR}}%F{${COLOUR_WHITE}}%} $(node_info) %{%K{${COLOR_FIVE}}%F{${COLOR_FOUR}}%}${POWERLINE_SYMBOL}'
+PROMPT+='%{%K{${COLOR_FIVE}}%F{${COLOUR_WHITE}}%}$(time_info)%{%k%F{${COLOR_FIVE}}%}${ENDING_ROUNDED}% '
+PROMPT+=$'\n %{%{%k%F{${COLOR_ONE}}%}└➤ %{%f%}'
