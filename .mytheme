@@ -32,8 +32,9 @@ STASH_SYMBOL=$'\ueb4b'
 NODE_SYMBOL=$'\ue718'
 LEADING_ROUNDED=$'\ue0b6'
 ENDING_ROUNDED=$'\ue0b4'
-FOLDER_SYMBOL=$'\uF115'
+FOLDER_SYMBOL=$'\uf07c'
 GIT_SYMBOL=$'\ue725'
+OPEN_FOLDER_SYMBOL=$'\uF115'
 
 # Git segment function
 git_info() {
@@ -49,19 +50,25 @@ git_stash_count() {
     [[ "$stash_count" -gt 0 ]] && echo " ${STASH_SYMBOL} ${stash_count}"
 }
 
-# Node segment function
-node_info() {
-    # First check if node exists
-    if ! command -v node &> /dev/null; then
-        echo "node not available"
+# Project info segment function
+project_info() {
+    # Check if in git repo first
+    if git rev-parse --is-inside-work-tree &> /dev/null; then
+        # In git repo, check for specific project files
+        if [ -f "Cargo.toml" ]; then
+            command -v rustc &> /dev/null && echo "🦀 v$(rustc --version | cut -d ' ' -f 2)" || echo "rust unavailable"
+            return
+        elif [ -f "package.json" ]; then
+            command -v node &> /dev/null && echo "${NODE_SYMBOL} $(node -v)" || echo "node unavailable"
+            return
+        else
+            echo "${ARROW_SYMBOL} ${FOLDER_SYMBOL}"
+            return
+        fi
     fi
     
-    # Then check for git repo or package.json
-    if git rev-parse --is-inside-work-tree &> /dev/null || [ -f "package.json" ]; then
-        echo "${NODE_SYMBOL} $(node -v)"
-    else
-        echo "local ${FOLDER_SYMBOL}"
-    fi
+    # Not in git repo
+    echo "local ${FOLDER_SYMBOL}"
 }
 
 # Time segment function
@@ -91,6 +98,6 @@ git_segment() {
 PROMPT='%{%k%F{${COLOR_ONE}}%}${LEADING_ROUNDED}%{%K{${COLOR_ONE}}%F{${COLOR_WHITE}}%}%n %{%K{${COLOR_TWO}}%F{${COLOR_ONE}}%}${POWERLINE_SYMBOL}'
 PROMPT+='%{%K{${COLOR_TWO}}%F{${COLOR_WHITE}}%} %~ '
 PROMPT+='$(git_segment)${POWERLINE_SYMBOL}'
-PROMPT+='%{%K{${COLOR_FOUR}}%F{${COLOR_WHITE}}%} $(node_info) %{%K{${COLOR_FIVE}}%F{${COLOR_FOUR}}%}${POWERLINE_SYMBOL}'
+PROMPT+='%{%K{${COLOR_FOUR}}%F{${COLOR_WHITE}}%} $(project_info) %{%K{${COLOR_FIVE}}%F{${COLOR_FOUR}}%}${POWERLINE_SYMBOL}'
 PROMPT+='%{%K{${COLOR_FIVE}}%F{${COLOR_WHITE}}%}$(time_info)%{%k%F{${COLOR_FIVE}}%}${ENDING_ROUNDED}% '
 PROMPT+=$'\n %{%{%k%F{${COLOR_ONE}}%}└➤ %{%f%}'
