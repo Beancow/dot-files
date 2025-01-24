@@ -6,23 +6,21 @@ setopt PROMPT_SUBST
 if [[ "$COLORTERM" == "truecolor" ]] || [[ "$TERM" == *"24bit"* ]]; then
     # True color (24-bit) support
     PRINCESS_WHITE='#FFFFFF'
-    PRINCESS_TAN='#CC3802'
-    PRINCESS_TEAL='#047E84'
-    PRINCESS_PLUM='#9A348E'
-    PRINCESS_BLUSH='#DA627D'
-    PRINCESS_SALMON='#FCA17D'
-    PRINCESS_SKY='#86BBD8'
-    PRINCESS_TEAL_BLUE='#33658A'
+    PRINCESS_COLOR_ONE='#D52D00'
+    PRINCESS_COLOR_TWO='#EF7627'
+    PRINCESS_COLOR_THREE='#FF9A56'
+    PRINCESS_COLOR_FOUR='#D162A4'
+    PRINCESS_COLOR_FIVE='#B55690'
+    PRINCESS_COLOR_SIX="#A30262"
 else
     # Fallback to 256 colors
-    PRINCESS_WHITE='255'    # Pure white
-    PRINCESS_TAN='166'     # Dark orange
-    PRINCESS_TEAL='30'     # Deep teal
-    PRINCESS_PLUM='161'    # Medium purple
-    PRINCESS_BLUSH='161'   # Pink
-    PRINCESS_SALMON='216'  # Light salmon
-    PRINCESS_SKY='110'     # Light blue
-    PRINCESS_TEAL_BLUE='25' # Deep blue
+    PRINCESS_WHITE='255'      # #FFFFFF
+    PRINCESS_COLOR_ONE='160' # #D52D00 -> Red
+    PRINCESS_COLOR_TWO='208'  # #EF7627 -> Dark Orange
+    PRINCESS_COLOR_THREE='215'  # #FF9A56 -> Light Orange
+    PRINCESS_COLOR_FOUR='169'   # #D162A4 -> Medium Pink
+    PRINCESS_COLOR_FIVE='132' # #B55690 -> Medium Purple
+    PRINCESS_COLOR_SIX='125' # #A30262 -> Deep Pink
 fi
 
 # Define special characters with proper escaping
@@ -82,16 +80,16 @@ is_git_repo() {
 # Conditional git segment
 princess_git_segment() {
     if is_git_repo; then
-        echo "%{%K{${PRINCESS_SALMON}}%F{${PRINCESS_BLUSH}}%}${POWERLINE_SYMBOL}%{%F{${PRINCESS_WHITE}}%}$(princess_git_info) %{%K{${PRINCESS_SKY}}%F{${PRINCESS_SALMON}}%}"
+        echo "%{%K{${PRINCESS_COLOR_THREE}}%F{${PRINCESS_COLOR_TWO}}%}${POWERLINE_SYMBOL}%{%F{${PRINCESS_WHITE}}%}$(princess_git_info) %{%K{${PRINCESS_COLOR_FOUR}}%F{${PRINCESS_COLOR_THREE}}%}"
     else
-        echo "%{%K{${PRINCESS_SKY}}%F{${PRINCESS_BLUSH}}%}"
+        echo "%{%K{${PRINCESS_COLOR_FOUR}}%F{${PRINCESS_COLOR_TWO}}%}"
     fi
 }
 
 # Update prompt definitions
-PROMPT='%{%k%F{${PRINCESS_PLUM}}%}${LEADING_ROUNDED}%{%K{${PRINCESS_PLUM}}%F{${PRINCESS_WHITE}}%}%n %{%K{${PRINCESS_BLUSH}}%F{${PRINCESS_PLUM}}%}${POWERLINE_SYMBOL}'
-PROMPT+='%{%K{${PRINCESS_BLUSH}}%F{${PRINCESS_WHITE}}%} %~ '
+PROMPT='%{%k%F{${PRINCESS_COLOR_ONE}}%}${LEADING_ROUNDED}%{%K{${PRINCESS_COLOR_ONE}}%F{${PRINCESS_WHITE}}%}%n %{%K{${PRINCESS_COLOR_TWO}}%F{${PRINCESS_COLOR_ONE}}%}${POWERLINE_SYMBOL}'
+PROMPT+='%{%K{${PRINCESS_COLOR_TWO}}%F{${PRINCESS_WHITE}}%} %~ '
 PROMPT+='$(princess_git_segment)${POWERLINE_SYMBOL}'
-PROMPT+='%{%K{${PRINCESS_SKY}}%F{${PRINCESS_WHITE}}%} $(princess_node_info) %{%K{${PRINCESS_TEAL_BLUE}}%F{${PRINCESS_SKY}}%}${POWERLINE_SYMBOL}'
-PROMPT+='%{%K{${PRINCESS_TEAL_BLUE}}%F{${PRINCESS_WHITE}}%}$(princess_time_info)%{%k%F{${PRINCESS_TEAL_BLUE}}%}${ENDING_ROUNDED}% '
-PROMPT+=$'\n %{%{%k%F{${PRINCESS_PLUM}}%}└➤ %{%f%}'
+PROMPT+='%{%K{${PRINCESS_COLOR_FOUR}}%F{${PRINCESS_WHITE}}%} $(princess_node_info) %{%K{${PRINCESS_COLOR_FIVE}}%F{${PRINCESS_COLOR_FOUR}}%}${POWERLINE_SYMBOL}'
+PROMPT+='%{%K{${PRINCESS_COLOR_FIVE}}%F{${PRINCESS_WHITE}}%}$(princess_time_info)%{%k%F{${PRINCESS_COLOR_FIVE}}%}${ENDING_ROUNDED}% '
+PROMPT+=$'\n %{%{%k%F{${PRINCESS_COLOR_ONE}}%}└➤ %{%f%}'
