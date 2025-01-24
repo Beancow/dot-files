@@ -35,6 +35,7 @@ ENDING_ROUNDED=$'\ue0b4'
 FOLDER_SYMBOL=$'\uf07c'
 GIT_SYMBOL=$'\ue725'
 OPEN_FOLDER_SYMBOL=$'\uF115'
+RUST_SYMBOL=$'\ue7a8'
 
 # Git segment function
 git_info() {
@@ -56,13 +57,13 @@ project_info() {
     if git rev-parse --is-inside-work-tree &> /dev/null; then
         # In git repo, check for specific project files
         if [ -f "Cargo.toml" ]; then
-            command -v rustc &> /dev/null && echo "🦀 v$(rustc --version | cut -d ' ' -f 2)" || echo "rust unavailable"
+            command -v rustc &> /dev/null && echo "${RUST_SYMBOL} v$(rustc --version | cut -d ' ' -f 2)" || echo "${RUST_SYMBOL} unavailable"
             return
         elif [ -f "package.json" ]; then
-            command -v node &> /dev/null && echo "${NODE_SYMBOL} $(node -v)" || echo "node unavailable"
+            command -v node &> /dev/null && echo "${NODE_SYMBOL} $(node -v)" || echo "${NODE_SYMBOL} unavailable"
             return
         else
-            echo "${ARROW_SYMBOL} ${FOLDER_SYMBOL}"
+            echo "${ARROW_SYMBOL} ${OPEN_FOLDER_SYMBOL}"
             return
         fi
     fi
