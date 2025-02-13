@@ -18,3 +18,4 @@ alias glo='git log --pretty="oneline"'
 alias glol='git log --graph --oneline --decorate'
 
 alias cls='clear'
+

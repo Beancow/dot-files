@@ -2,53 +2,63 @@
 # Enable command substitution in prompt
 setopt PROMPT_SUBST
 
-# Color definitions
-# Check terminal color support
+# Symbols
+typeset -A symbols=(
+    [powerline]=$'\ue0b0'
+    [heart]=$'\u2764'
+    [arrow]=$'\u279c'
+    [stash]=$'\ueb4b'
+    [node]=$'\ue718'
+    [round_left]=$'\ue0b6'
+    [round_right]=$'\ue0b4'
+    [folder]=$'\uf07c'
+    [git]=$'\ue725'
+    [open_folder]=$'\uF115'
+    [rust]=$'\ue7a8'
+)
+
+# Colors
+typeset -A colors
 if [[ "$COLORTERM" == "truecolor" ]] || [[ "$TERM" == *"24bit"* ]]; then
-    # True color (24-bit) support
-    COLOR_WHITE='#FFFFFF'
-    COLOR_ONE='#D52D00'
-    COLOR_TWO='#EF7627'
-    COLOR_THREE='#FF9A56'
-    COLOR_FOUR='#D162A4'
-    COLOR_FIVE='#B55690'
-    COLOR_SIX="#A30262"
+    colors=(
+        [white]='#FFFFFF'
+        [one]='#D52D00'
+        [two]='#EF7627'
+        [three]='#FF9A56'
+        [four]='#D162A4'
+        [five]='#B55690'
+        [six]='#A30262'
+    )
 else
-    # Fallback to 256 colors
-    COLOR_WHITE='255' # #FFFFFF
-    COLOR_ONE='160'   # #D52D00 -> Red
-    COLOR_TWO='208'   # #EF7627 -> Dark Orange
-    COLOR_THREE='215' # #FF9A56 -> Light Orange
-    COLOR_FOUR='169'  # #D162A4 -> Medium Pink
-    COLOR_FIVE='132'  # #B55690 -> Medium Purple
-    COLOR_SIX='125'   # #A30262 -> Deep Pink
+    colors=(
+        [white]='255'
+        [one]='160'
+        [two]='208'
+        [three]='215'
+        [four]='169'
+        [five]='132'
+        [six]='125'
+    )
 fi
 
-# Define special characters with proper escaping
-POWERLINE_SYMBOL=$'\ue0b0'
-HEART_SYMBOL=$'\u2764'
-ARROW_SYMBOL=$'\u279c'
-STASH_SYMBOL=$'\ueb4b'
-NODE_SYMBOL=$'\ue718'
-LEADING_ROUNDED=$'\ue0b6'
-ENDING_ROUNDED=$'\ue0b4'
-FOLDER_SYMBOL=$'\uf07c'
-GIT_SYMBOL=$'\ue725'
-OPEN_FOLDER_SYMBOL=$'\uF115'
-RUST_SYMBOL=$'\ue7a8'
+# Segment builder
+segment() {
+    local bg="$1" fg="${2:-${colors[white]}}" content="$3"
+    echo "%K{${colors[$bg]}}%F{$fg} $content %k%f${symbols[powerline]}"
+}
 
 # Git segment function
 git_info() {
     local ref
     ref=$(command git symbolic-ref HEAD 2> /dev/null) || \
     ref=$(command git rev-parse --short HEAD 2> /dev/null) || return 0
-    echo " ${ARROW_SYMBOL} (${ref#refs/heads/}$(git_stash_count)) ${GIT_SYMBOL}"
+    echo " ${symbols[arrow]} (${ref#refs/heads/}$(git_stash_count)) ${symbols[git]}"
 }
 
 git_stash_count() {
     local stash_count
     stash_count=$(git stash list 2>/dev/null | wc -l | tr -d ' ')
-    [[ "$stash_count" -gt 0 ]] && echo " ${STASH_SYMBOL} ${stash_count}"
+    [[ "$stash_count" -gt 0 ]] && echo " ${symbols[stash]} ${stash_count}"
 }
 
 # Project info segment function
@@ -57,28 +67,28 @@ project_info() {
     if git rev-parse --is-inside-work-tree &> /dev/null; then
         # In git repo, check for specific project files
         if [ -f "Cargo.toml" ]; then
-            command -v rustc &> /dev/null && echo "${RUST_SYMBOL} v$(rustc --version | cut -d ' ' -f 2)" || echo "${RUST_SYMBOL} unavailable"
+            command -v rustc &> /dev/null && echo "${symbols[rust]} v$(rustc --version | cut -d ' ' -f 2)" || echo "${symbols[rust]} unavailable"
             return
         elif [ -f "package.json" ]; then
-            command -v node &> /dev/null && echo "${NODE_SYMBOL} $(node -v)" || echo "${NODE_SYMBOL} unavailable"
+            command -v node &> /dev/null && echo "${symbols[node]} $(node -v)" || echo "${symbols[node]} unavailable"
             return
         else
-            echo "${ARROW_SYMBOL} ${OPEN_FOLDER_SYMBOL}"
+            echo "${symbols[arrow]} ${symbols[open_folder]}"
             return
         fi
     fi
     
     # Not in git repo
-    echo "local ${FOLDER_SYMBOL}"
+    echo "local ${symbols[folder]}"
 }
 
 # Time segment function
 time_info() {
-    echo " ${HEART_SYMBOL} $(date '+%H:%M') "
+    echo " ${symbols[heart]} $(date '+%H:%M') "
 }
 
 path_info() {
-    echo " ${FOLDER_SYMBOL} %~ "
+    echo " ${symbols[folder]} %~ "
 }
 
 # Add new function to check if in git repo
@@ -89,16 +99,38 @@ is_git_repo() {
 # Conditional git segment
 git_segment() {
     if is_git_repo; then
-        echo "%{%K{${COLOR_THREE}}%F{${COLOR_TWO}}%}${POWERLINE_SYMBOL}%{%F{${COLOR_WHITE}}%}$(git_info) %{%K{${COLOR_FOUR}}%F{${COLOR_THREE}}%}"
+        echo "%{%K{${colors[three]}}%F{${colors[two]}}%}${symbols[powerline]}%{%F{${colors[white]}}%}$(git_info) %{%K{${colors[four]}}%F{${colors[three]}}%}"
     else
-        echo "%{%K{${COLOR_FOUR}}%F{${COLOR_TWO}}%}"
+        echo "%{%K{${colors[four]}}%F{${colors[two]}}%}"
     fi
 }
 
-# Update prompt definitions
-PROMPT='%{%k%F{${COLOR_ONE}}%}${LEADING_ROUNDED}%{%K{${COLOR_ONE}}%F{${COLOR_WHITE}}%}%n %{%K{${COLOR_TWO}}%F{${COLOR_ONE}}%}${POWERLINE_SYMBOL}'
-PROMPT+='%{%K{${COLOR_TWO}}%F{${COLOR_WHITE}}%} %~ '
-PROMPT+='$(git_segment)${POWERLINE_SYMBOL}'
-PROMPT+='%{%K{${COLOR_FOUR}}%F{${COLOR_WHITE}}%} $(project_info) %{%K{${COLOR_FIVE}}%F{${COLOR_FOUR}}%}${POWERLINE_SYMBOL}'
-PROMPT+='%{%K{${COLOR_FIVE}}%F{${COLOR_WHITE}}%}$(time_info)%{%k%F{${COLOR_FIVE}}%}${ENDING_ROUNDED}% '
-PROMPT+=$'\n %{%{%k%F{${COLOR_ONE}}%}└➤ %{%f%}'
+build_info_line() {
+    # Initialize array to store prompt segments
+    local -a segments
+
+    # Username segment with leading rounded edge
+    segments+=("%{%k%F{${colors[one]}}%}${symbols[round_left]}%{%K{${colors[one]}}%F{${colors[white]}}%}%n ")
+
+    # Directory segment
+    segments+=("%{%K{${colors[two]}}%F{${colors[one]}}%}${symbols[powerline]}%{%F{${colors[white]}}%} %~ ")
+
+    # Git information segment (conditional)
+    segments+=("$(git_segment)${symbols[powerline]}")
+
+    # Project information segment
+    segments+=("%{%K{${colors[four]}}%F{${colors[white]}}%} $(project_info) ")
+
+    # Time segment with ending rounded edge
+    segments+=("%{%K{${colors[five]}}%F{${colors[four]}}%}${symbols[powerline]}%{%F{${colors[white]}}%}$(time_info)%{%k%F{${colors[five]}}%}${symbols[round_right]}")
+
+    # Join all segments and output
+    echo $'\n'"${(j::)segments}"
+}
+
+precmd() {
+    print -P "$(build_info_line)"
+}
+
+PROMPT=$'\n'"|> "
+
