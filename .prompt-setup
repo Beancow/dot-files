@@ -63,23 +63,25 @@ git_stash_count() {
 
 # Project info segment function
 project_info() {
-    # Check if in git repo first
-    if git rev-parse --is-inside-work-tree &> /dev/null; then
-        # In git repo, check for specific project files
-        if [ -f "Cargo.toml" ]; then
-            command -v rustc &> /dev/null && echo "${symbols[rust]} v$(rustc --version | cut -d ' ' -f 2)" || echo "${symbols[rust]} unavailable"
-            return
-        elif [ -f "package.json" ]; then
-            command -v node &> /dev/null && echo "${symbols[node]} $(node -v)" || echo "${symbols[node]} unavailable"
-            return
-        else
-            echo "${symbols[arrow]} ${symbols[open_folder]}"
-            return
-        fi
+    # Return early if not in git repo
+    if ! git rev-parse --is-inside-work-tree &> /dev/null; then
+        echo "local ${symbols[folder]}"
+        return
+    fi
+    ## Move to top of git tree using aliased function cdgt
+    cdgt
+    # In git repo, check for specific project files
+    if [ -f "Cargo.toml" ]; then
+        command -v rustc &> /dev/null && echo "${symbols[rust]} v$(rustc --version | cut -d ' ' -f 2)" || echo "${symbols[rust]} unavailable"
+        return
     fi
     
-    # Not in git repo
-    echo "local ${symbols[folder]}"
+    if [ -f "package.json" ]; then
+        command -v node &> /dev/null && echo "${symbols[node]} $(node -v)" || echo "${symbols[node]} unavailable"
+        return
+    fi
+    
+    echo "${symbols[arrow]} ${symbols[open_folder]}"
 }
 
 # Time segment function

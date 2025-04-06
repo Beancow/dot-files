@@ -8,7 +8,7 @@ alias gtdr='git tag --delete origin'
 alias gr='git branch -r'
 alias gplo='git pull origin'
 alias gb='git branch '
-alias gc='git commit'
+alias gc='git commit -m'
 alias gd='git diff'
 alias gco='git checkout '
 alias gl='git log'
@@ -16,6 +16,13 @@ alias gr='git remote'
 alias grs='git remote show'
 alias glo='git log --pretty="oneline"'
 alias glol='git log --graph --oneline --decorate'
+alias gic='git init && git add -A && git commit -m "initial commit"'
+alias ghrc='gh repo create "${PWD##*/}" '
 
+cdgt() {
+    cd "$(git rev-parse --show-toplevel)"
+}
+
+## Muscle menory is hard!
 alias cls='clear'
 
