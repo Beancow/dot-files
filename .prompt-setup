@@ -7,7 +7,6 @@ typeset -A symbol_list=(
     [powerline]=$'\ue0b0'
     [heart]=$'\u2764'
     [arrow]=$'\u279c'
-    [star]=$'\u2605'
     [stash]=$'\ueb4b'
     [node]=$'\ue718'
     [round_left]=$'\ue0b6'
@@ -18,7 +17,7 @@ typeset -A symbol_list=(
     [rust]=$'\ue7a8'
 )
 
-# Colors
+# Colors with fallback for 256 colors
 typeset -A colors
 if [[ "$COLORTERM" == "truecolor" ]] || [[ "$TERM" == *"24bit"* ]]; then
     colors=(
@@ -43,7 +42,7 @@ else
 fi
 
 
-# segment helper
+# segment helper - Helps to keep them consistent
 wrap_segment() {
     local -a segment
     local start=$1 # is this the start of the line "true or false"
@@ -98,7 +97,16 @@ get_node_version() {
     fi
 }
 
-# Project info segment function
+get_python_venv() {
+    local venv
+    venv=$(python3 -c 'import sys; print(sys.prefix)' 2> /dev/null)
+    if [[ $? -eq 0 ]]; then
+        echo "python: v$(basename $venv)"
+    else
+        echo "python unavailable"
+    fi
+}
+
 project_info() {
     if [ -f "Cargo.toml" ]; then
         get_rust_version
@@ -106,6 +114,9 @@ project_info() {
 
     if [ -f "package.json" ]; then
         get_node_version
+    fi
+    if [ -f 'pipfile' ]; then
+        get_python_venv
     fi
 }
 
@@ -117,22 +128,29 @@ path_info() {
     fi
 }
 
+get_project_subfolder() {
+    local segmentsToShow=$1 # number of segments to show
+    local removeString=$2 # string to remove
+    echo ${(%):-%${segmentsToShow}~} | sed -e "s/.*${removeString}//g"
+}
+
 function build_info_line() {
     local -a segments
     local -a basedir
     local -a pathInfo
+    local -a lastTwoDirSegments
     basedir=$(basename $(pwd))   
     pathInfo=$(path_info)
 
     segments+="$(wrap_segment "true" "${colors[one]}" ${(%):-%n})"
     
-    segments+="$(wrap_segment "false" "${colors[two]}" "repo: $pathInfo")"
+    segments+="$(wrap_segment "false" "${colors[two]}" "$pathInfo")"
 
     if is_git_repo ; then
         segments+="$(wrap_segment "false" "${colors[three]}" "$(git_info)")"
     fi
     if is_git_repo && [[ "$basedir" != "$pathInfo" ]] ; then
-        segments+="$(wrap_segment "false" "${colors[four]}" "%~")"
+        segments+="$(wrap_segment "false" "${colors[four]}" "$(get_project_subfolder 3 $pathInfo)")"
     fi
     if is_git_repo && [[ "$basedir" == "$pathInfo" ]] ; then
         segments+="$(wrap_segment "false" "${colors[five]}" "$(project_info)")"
@@ -144,4 +162,4 @@ precmd() {
     print -P "\n$(build_info_line)\n"
 }
 
-PROMPT=" ${symbol_list[heart]} $(date '+%H:%M') |>"
+PROMPT="$(wrap_segment "true" "${colors[five]}" "${symbol_list[heart]} $(date '+%H:%M')") %f%k"
