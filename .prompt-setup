@@ -5,6 +5,7 @@ setopt PROMPT_SUBST
 # Symbols
 typeset -A symbol_list=(
     [powerline]=$'\ue0b0'
+    [slash]=$'\ue0b8'
     [heart]=$'\u2764'
     [arrow]=$'\u279c'
     [stash]=$'\ueb4b'
@@ -53,9 +54,9 @@ wrap_segment() {
     if [[ $start == "true" ]]; then
         segment+="%F{$segment_color}$symbol_list[round_left]"
     else
-        segment+="%k%F%K{$segment_color}${symbol_list[powerline]}"
+        segment+="%k%F%K{$segment_color}${symbol_list[slash]}"
     fi
-    segment+="%K{$segment_color}%F{$colors[white]} $content %k%F{$segment_color}${symbol_list[powerline]}"
+    segment+="%K{$segment_color}%F{$colors[white]} $content %k%F{$segment_color}${symbol_list[slash]}"
     
     echo $segment
 }
@@ -107,17 +108,22 @@ get_python_venv() {
     fi
 }
 
+# This is not an exhaustive list, but it is easily extensible
 project_info() {
     if [ -f "Cargo.toml" ]; then
         get_rust_version
+        return
     fi
 
     if [ -f "package.json" ]; then
         get_node_version
+        return
     fi
     if [ -f 'pipfile' ]; then
         get_python_venv
+        return
     fi
+    echo "$symbol_list[arrow] $symbol_list[folder]"
 }
 
 path_info() {
@@ -150,7 +156,7 @@ function build_info_line() {
         segments+="$(wrap_segment "false" "${colors[three]}" "$(git_info)")"
     fi
     if is_git_repo && [[ "$basedir" != "$pathInfo" ]] ; then
-        segments+="$(wrap_segment "false" "${colors[four]}" "$(get_project_subfolder 3 $pathInfo)")"
+        segments+="$(wrap_segment "false" "${colors[four]}" "$(get_project_subfolder 6 $pathInfo)")"
     fi
     if is_git_repo && [[ "$basedir" == "$pathInfo" ]] ; then
         segments+="$(wrap_segment "false" "${colors[five]}" "$(project_info)")"
@@ -162,4 +168,4 @@ precmd() {
     print -P "\n$(build_info_line)\n"
 }
 
-PROMPT="$(wrap_segment "true" "${colors[five]}" "${symbol_list[heart]} $(date '+%H:%M')") %f%k"
+PROMPT="%k%F{$colors[six]}$symbol_list[round_left]%K{$colors[six]}%F{$colors[white]} ${symbol_list[heart]} $(date '+%H:%M') %k%F{$colors[six]}$symbol_list[round_right] %f|> "
