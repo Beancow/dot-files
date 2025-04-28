@@ -1,7 +1,5 @@
 # Avery's Dot Files
 
-# Avery's Dot Files
-
 This repository contains my personal configuration files (dot files) for customizing my development environment.
 
 ![Terminal Preview](preview.png)
