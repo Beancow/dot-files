@@ -26,7 +26,7 @@ This configuration focuses on customizing the ZSH prompt directly, without relyi
 
 This setup includes a collection of custom utility scripts and aliases to streamline common development tasks and increase productivity. These shortcuts help automate repetitive commands and provide quick access to frequently used functions.
 
-![Utility Aliases Example](alias_exmple_util.png)
+![Utility Aliases Example](alias_example_util.png)
 
 ## Usage
 
