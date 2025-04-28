@@ -51,9 +51,18 @@ This configuration focuses on customizing the ZSH prompt directly, without relyi
 ## Usage
 
 1. Clone this repository
-2. Symlink or copy the desired configuration files to your home directory
+2. Symlink or copy the desired configuration files to your home directory or refernce them in your .profile etc? many option!
 3. Restart your terminal to see the changes
 
 ## Customization
 
 Feel free to fork this repository and modify it to suit your preferences!
+
+## Future Plans
+
+I'm exploring several new development opportunities to enhance this configuration:
+
+- **Rust & Lua Utilities**: Planning to develop additional utility scripts in these languages for better performance and flexibility
+- **Swift CLI Timer App**: Working on a terminal-based timer to encourage regular movement throughout the day
+
+These projects will not only improve my productivity but also serve as valuable learning experiences in languages I'm looking to master.
