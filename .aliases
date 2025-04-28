@@ -19,10 +19,6 @@ alias glol='git log --graph --oneline --decorate'
 alias gic='git init && git add -A && git commit -m "initial commit"'
 alias ghrc='gh repo create "${PWD##*/}" '
 
-cdgt() {
-    cd "$(git rev-parse --show-toplevel)"
-}
-
 ## Muscle menory is hard!
 alias cls='clear'
 

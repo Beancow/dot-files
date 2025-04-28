@@ -3,10 +3,11 @@
 setopt PROMPT_SUBST
 
 # Symbols
-typeset -A symbols=(
+typeset -A symbol_list=(
     [powerline]=$'\ue0b0'
     [heart]=$'\u2764'
     [arrow]=$'\u279c'
+    [star]=$'\u2605'
     [stash]=$'\ueb4b'
     [node]=$'\ue718'
     [round_left]=$'\ue0b6'
@@ -41,98 +42,106 @@ else
     )
 fi
 
-# Segment builder
-segment() {
-    local bg="$1" fg="${2:-${colors[white]}}" content="$3"
-    echo "%K{${colors[$bg]}}%F{$fg} $content %k%f${symbols[powerline]}"
+
+# segment helper
+wrap_segment() {
+    local -a segment
+    local start=$1 # is this the start of the line "true or false"
+    local segment_color=$2 # the color for this segment main color passed in as hex
+    local content=$3 # segment content
+
+    segment="%f"
+    if [[ $start == "true" ]]; then
+        segment+="%F{$segment_color}$symbol_list[round_left]"
+    else
+        segment+="%k%F%K{$segment_color}${symbol_list[powerline]}"
+    fi
+    segment+="%K{$segment_color}%F{$colors[white]} $content %k%F{$segment_color}${symbol_list[powerline]}"
+    
+    echo $segment
 }
 
-# Git segment function
 git_info() {
     local ref
     ref=$(command git symbolic-ref HEAD 2> /dev/null) || \
     ref=$(command git rev-parse --short HEAD 2> /dev/null) || return 0
-    echo " ${symbols[arrow]} (${ref#refs/heads/}$(git_stash_count)) ${symbols[git]}"
+    echo " ${symbol_list[arrow]} (${ref#refs/heads/}$(git_stash_count)) ${symbol_list[git]}"
 }
 
 git_stash_count() {
     local stash_count
     stash_count=$(git stash list 2>/dev/null | wc -l | tr -d ' ')
-    [[ "$stash_count" -gt 0 ]] && echo " ${symbols[stash]} ${stash_count}"
+    [[ "$stash_count" -gt 0 ]] && echo " ${symbol_list[stash]} ${stash_count}"
 }
 
-# Project info segment function
-project_info() {
-    # Return early if not in git repo
-    if ! git rev-parse --is-inside-work-tree &> /dev/null; then
-        echo "local ${symbols[folder]}"
-        return
-    fi
-    ## Move to top of git tree using aliased function cdgt
-    cdgt
-    # In git repo, check for specific project files
-    if [ -f "Cargo.toml" ]; then
-        command -v rustc &> /dev/null && echo "${symbols[rust]} v$(rustc --version | cut -d ' ' -f 2)" || echo "${symbols[rust]} unavailable"
-        return
-    fi
-    
-    if [ -f "package.json" ]; then
-        command -v node &> /dev/null && echo "${symbols[node]} $(node -v)" || echo "${symbols[node]} unavailable"
-        return
-    fi
-    
-    echo "${symbols[arrow]} ${symbols[open_folder]}"
-}
-
-# Time segment function
-time_info() {
-    echo " ${symbols[heart]} $(date '+%H:%M') "
-}
-
-path_info() {
-    echo " ${symbols[folder]} %~ "
-}
-
-# Add new function to check if in git repo
 is_git_repo() {
     git rev-parse --is-inside-work-tree &> /dev/null
 }
 
-# Conditional git segment
-git_segment() {
-    if is_git_repo; then
-        echo "%{%K{${colors[three]}}%F{${colors[two]}}%}${symbols[powerline]}%{%F{${colors[white]}}%}$(git_info) %{%K{${colors[four]}}%F{${colors[three]}}%}"
+get_rust_version() {
+    local rust_version
+    rust_version=$(rustc --version 2> /dev/null)
+    if [[ $? -eq 0 ]]; then
+        echo "${symbol_list[rust]} v${rust_version#* }"
     else
-        echo "%{%K{${colors[four]}}%F{${colors[two]}}%}"
+        echo "${symbol_list[rust]} unavailable"
     fi
 }
 
-build_info_line() {
-    # Initialize array to store prompt segments
+get_node_version() {
+    local node_version
+    node_version=$(node -v 2> /dev/null)
+    if [[ $? -eq 0 ]]; then
+        echo "${symbol_list[node]} v${node_version#*v}"
+    else
+        echo "${symbol_list[node]} unavailable"
+    fi
+}
+
+# Project info segment function
+project_info() {
+    if [ -f "Cargo.toml" ]; then
+        get_rust_version
+    fi
+
+    if [ -f "package.json" ]; then
+        get_node_version
+    fi
+}
+
+path_info() {
+    if is_git_repo; then
+        echo "$(basename $(git rev-parse --show-toplevel))"
+    else
+        echo "%~"
+    fi
+}
+
+function build_info_line() {
     local -a segments
+    local -a basedir
+    local -a pathInfo
+    basedir=$(basename $(pwd))   
+    pathInfo=$(path_info)
 
-    # Username segment with leading rounded edge
-    segments+=("%{%k%F{${colors[one]}}%}${symbols[round_left]}%{%K{${colors[one]}}%F{${colors[white]}}%}%n ")
+    segments+="$(wrap_segment "true" "${colors[one]}" ${(%):-%n})"
+    
+    segments+="$(wrap_segment "false" "${colors[two]}" "repo: $pathInfo")"
 
-    # Directory segment
-    segments+=("%{%K{${colors[two]}}%F{${colors[one]}}%}${symbols[powerline]}%{%F{${colors[white]}}%} %~ ")
-
-    # Git information segment (conditional)
-    segments+=("$(git_segment)${symbols[powerline]}")
-
-    # Project information segment
-    segments+=("%{%K{${colors[four]}}%F{${colors[white]}}%} $(project_info) ")
-
-    # Time segment with ending rounded edge
-    segments+=("%{%K{${colors[five]}}%F{${colors[four]}}%}${symbols[powerline]}%{%F{${colors[white]}}%}$(time_info)%{%k%F{${colors[five]}}%}${symbols[round_right]}")
-
-    # Join all segments and output
-    echo $'\n'"${(j::)segments}"
+    if is_git_repo ; then
+        segments+="$(wrap_segment "false" "${colors[three]}" "$(git_info)")"
+    fi
+    if is_git_repo && [[ "$basedir" != "$pathInfo" ]] ; then
+        segments+="$(wrap_segment "false" "${colors[four]}" "%~")"
+    fi
+    if is_git_repo && [[ "$basedir" == "$pathInfo" ]] ; then
+        segments+="$(wrap_segment "false" "${colors[five]}" "$(project_info)")"
+    fi
+    echo "${(j::)segments}"
 }
 
 precmd() {
-    print -P "$(build_info_line)"
+    print -P "\n$(build_info_line)\n"
 }
 
-PROMPT=$'\n'"|> "
-
+PROMPT=" ${symbol_list[heart]} $(date '+%H:%M') |>"
